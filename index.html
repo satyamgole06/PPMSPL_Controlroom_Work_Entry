@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Control Room Work Entry - Task Management System">
+  <meta name="theme-color" content="#5E35B1">
+  <title>Control Room Work Entry | Task Management System</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Material+Icons+Outlined&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Progress Indicator -->
+  <div id="progressBar" class="progress-bar" aria-hidden="true"></div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-overlay"></div>
+    <div class="modal-content glass-card">
+      <div class="modal-icon success-icon">
+        <span class="material-icons-outlined">check_circle</span>
+      </div>
+      <h2 id="modalTitle">Ticket Created Successfully</h2>
+      <p class="ticket-id-display">Ticket ID: <strong id="generatedTicketId"></strong></p>
+      <p class="modal-message">Your work entry has been saved to the system.</p>
+      <button type="button" class="btn btn-primary" id="closeModalBtn">
+        <span class="material-icons-outlined">done</span>
+        Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header glass-header">
+      <div class="header-left">
+        <div class="logo-placeholder" aria-hidden="true">
+          <span class="material-icons-outlined">hub</span>
+        </div>
+        <div class="header-titles">
+          <h1 class="app-title">Control Room Work Entry</h1>
+          <p class="app-subtitle">Task Management System</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="datetime-display" id="datetimeDisplay">
+          <span class="material-icons-outlined">schedule</span>
+          <span id="liveDateTime"></span>
+        </div>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle Dark Mode">
+          <span class="material-icons-outlined light-icon">dark_mode</span>
+          <span class="material-icons-outlined dark-icon">light_mode</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="form-card glass-card">
+        <div class="card-header">
+          <h2>
+            <span class="material-icons-outlined">assignment</span>
+            New Work Entry
+          </h2>
+          <p class="card-subtitle">Fill in the details below to create a new task ticket</p>
+        </div>
+
+        <form id="workEntryForm" novalidate autocomplete="off">
+          <!-- Row 1: Employee Info -->
+          <div class="form-row">
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon material-icons-outlined">person</span>
+                <input type="text" id="employeeName" name="employeeName" required maxlength="100" placeholder=" " aria-required="true" aria-describedby="employeeNameError">
+                <label for="employeeName" class="floating-label">Employee Name <span class="required">*</span></label>
+              </div>
+              <span class="error-message" id="employeeNameError" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon material-icons-outlined">badge</span>
+                <input type="text" id="employeeId" name="employeeId" maxlength="50" placeholder=" " aria-describedby="employeeIdError">
+                <label for="employeeId" class="floating-label">Employee ID</label>
+              </div>
+              <span class="error-message" id="employeeIdError" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Row 2: Work Type & Vehicle -->
+          <div class="form-row">
+            <div class="form-group">
+              <div class="input-wrapper select-wrapper">
+                <span class="input-icon material-icons-outlined">category</span>
+                <select id="workType" name="workType" required aria-required="true" aria-describedby="workTypeError">
+                  <option value="" disabled selected hidden></option>
+                  <option value="Arrival Related">Arrival Related</option>
+                  <option value="Dept Related">Dept Related</option>
+                  <option value="Driver Related">Driver Related</option>
+                  <option value="Vehicle Compliance Related">Vehicle Compliance Related</option>
+                  <option value="Regeneration Related">Regeneration Related</option>
+                  <option value="DTC Related">DTC Related</option>
+                  <option value="Exception Related">Exception Related</option>
+                </select>
+                <label for="workType" class="floating-label">Work Type <span class="required">*</span></label>
+                <span class="select-arrow material-icons-outlined">expand_more</span>
+              </div>
+              <span class="error-message" id="workTypeError" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon material-icons-outlined">directions_car</span>
+                <input type="text" id="vehicleNumber" name="vehicleNumber" maxlength="20" placeholder=" " aria-describedby="vehicleNumberError" style="text-transform: uppercase;">
+                <label for="vehicleNumber" class="floating-label">Vehicle Number</label>
+              </div>
+              <span class="error-message" id="vehicleNumberError" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Row 3: Driver & Route -->
+          <div class="form-row">
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon material-icons-outlined">airline_seat_recline_normal</span>
+                <input type="text" id="driverName" name="driverName" maxlength="100" placeholder=" " aria-describedby="driverNameError">
+                <label for="driverName" class="floating-label">Driver Name</label>
+              </div>
+              <span class="error-message" id="driverNameError" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon material-icons-outlined">route</span>
+                <input type="text" id="route" name="route" maxlength="100" placeholder=" " aria-describedby="routeError">
+                <label for="route" class="floating-label">Route</label>
+              </div>
+              <span class="error-message" id="routeError" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Row 4: Priority & Status -->
+          <div class="form-row">
+            <div class="form-group">
+              <div class="input-wrapper select-wrapper">
+                <span class="input-icon material-icons-outlined">priority_high</span>
+                <select id="taskPriority" name="taskPriority" required aria-required="true" aria-describedby="taskPriorityError">
+                  <option value="" disabled selected hidden></option>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">Critical</option>
+                </select>
+                <label for="taskPriority" class="floating-label">Task Priority <span class="required">*</span></label>
+                <span class="select-arrow material-icons-outlined">expand_more</span>
+              </div>
+              <span class="error-message" id="taskPriorityError" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <div class="input-wrapper select-wrapper">
+                <span class="input-icon material-icons-outlined">pending_actions</span>
+                <select id="taskStatus" name="taskStatus" required aria-required="true" aria-describedby="taskStatusError">
+                  <option value="" disabled selected hidden></option>
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+                <label for="taskStatus" class="floating-label">Task Status <span class="required">*</span></label>
+                <span class="select-arrow material-icons-outlined">expand_more</span>
+              </div>
+              <span class="error-message" id="taskStatusError" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Row 5: Date & Time -->
+          <div class="form-row">
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon material-icons-outlined">event</span>
+                <input type="date" id="taskDate" name="taskDate" required aria-required="true" aria-describedby="taskDateError">
+                <label for="taskDate" class="floating-label filled">Date <span class="required">*</span></label>
+              </div>
+              <span class="error-message" id="taskDateError" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon material-icons-outlined">access_time</span>
+                <input type="time" id="taskTime" name="taskTime" required aria-required="true" aria-describedby="taskTimeError">
+                <label for="taskTime" class="floating-label filled">Time <span class="required">*</span></label>
+              </div>
+              <span class="error-message" id="taskTimeError" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Row 6: Remark -->
+          <div class="form-row full-width">
+            <div class="form-group">
+              <div class="input-wrapper textarea-wrapper">
+                <span class="input-icon material-icons-outlined">notes</span>
+                <textarea id="remark" name="remark" maxlength="500" rows="4" placeholder=" " aria-describedby="remarkError remarkCounter"></textarea>
+                <label for="remark" class="floating-label">Remark</label>
+              </div>
+              <div class="field-footer">
+                <span class="error-message" id="remarkError" role="alert"></span>
+                <span class="char-counter" id="remarkCounter">0 / 500</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 7: Attachment -->
+          <div class="form-row full-width">
+            <div class="form-group">
+              <div class="file-upload-wrapper" id="fileUploadArea">
+                <input type="file" id="attachment" name="attachment" accept="*/*" aria-describedby="attachmentError attachmentName">
+                <div class="file-upload-content">
+                  <span class="material-icons-outlined upload-icon">cloud_upload</span>
+                  <p class="upload-text">Click to upload or drag & drop</p>
+                  <p class="upload-hint">Any file type supported</p>
+                  <p class="file-name" id="attachmentName"></p>
+                </div>
+                <button type="button" class="btn-remove-file" id="removeFileBtn" aria-label="Remove file" hidden>
+                  <span class="material-icons-outlined">close</span>
+                </button>
+              </div>
+              <span class="error-message" id="attachmentError" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="resetBtn">
+              <span class="material-icons-outlined">restart_alt</span>
+              Reset
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span class="btn-content">
+                <span class="material-icons-outlined">send</span>
+                Submit Entry
+              </span>
+              <span class="btn-spinner" hidden>
+                <span class="spinner"></span>
+                Saving...
+              </span>
+            </button>
+          </div>
+
+          <p class="keyboard-hint">
+            <span class="material-icons-outlined">keyboard</span>
+            Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to submit
+          </p>
+        </form>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; <span id="footerYear"></span> Control Room Work Management System. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
